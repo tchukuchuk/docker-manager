@@ -8,12 +8,8 @@ module DockerManager
   extend self
 
   def run
-    unless File.exist?("./dockermanager.yml")
-      puts "dockermanager.yml file not found"
-      exit 1
-    end
     if ARGV.size != 2
-      puts "usage: dockermanager environment [deploy|db_pull]"
+      puts "usage: dockermanager environment [deploy|db_pull] config_file"
       exit 2
     end
     klass = "Commands::#{ARGV[1].split('_').collect(&:capitalize).join}"
