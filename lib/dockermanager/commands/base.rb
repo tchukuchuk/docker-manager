@@ -10,7 +10,7 @@ module DockerManager
       def initialize(env:, config_file: )
         self.config = Config.new(
           env: env,
-          config_file: (config_file || "./dockermanager.yml")
+          config_file: (config_file || "./docker-manager.yml")
         )
         init_sshkit
       end

@@ -12,7 +12,7 @@ module DockerManager
           download!(remote_dump_file, local_dump_file)
         end
         run_locally do
-          execute(:rm, "#{project_root_path}/tmp/dump.sql")
+          execute(:rm, "-f", "#{project_root_path}/tmp/dump.sql")
           execute("gunzip #{local_dump_file}")
           # condition pg_stat_activity.datname = \'#{local_database}\' removed
           execute("docker exec -i #{local_postgres_db_container} bash -c 'psql -U $POSTGRES_USER -d $POSTGRES_DB -c \"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid()\"'")
