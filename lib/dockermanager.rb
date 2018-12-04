@@ -8,7 +8,7 @@ module DockerManager
   extend self
 
   def run
-    if ARGV.size != 2
+    if ARGV.size < 2
       puts "usage: dockermanager environment [deploy|db_pull] config_file"
       exit 2
     end
