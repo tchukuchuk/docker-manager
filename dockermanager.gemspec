@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.description = ''
   s.license = ''
   s.email = 'julien.biard@gmail.com'
-  s.executables = ['dockermanager']
+  s.executables = ['docker-manager']
   s.extra_rdoc_files = %w[CHANGELOG.md README.md]
   s.files = `git ls-files -z`.split("\0")
   s.test_files = `git ls-files -z spec/`.split("\0")
