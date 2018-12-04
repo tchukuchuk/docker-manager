@@ -21,10 +21,13 @@ module DockerManager
 
     def project_root_path
       return @project_root_path if defined?(@project_root_path)
-      @project_root_path = value(key: :project_root_path, required: true)
-      unless Dir.exist?(@project_root_path)
-        puts "invalid project_root_path : #{@project_root_path}"
-        exit 3
+      if @project_root_path = value(key: :project_root_path, required: false)
+        unless Dir.exist?(@project_root_path)
+          puts "invalid project_root_path : #{@project_root_path}"
+          exit 3
+        end
+      else
+        @project_root_path = "./"
       end
       @project_root_path
     end
