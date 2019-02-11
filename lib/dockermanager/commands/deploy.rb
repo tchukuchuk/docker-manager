@@ -17,7 +17,7 @@ module DockerManager
           execute("cd #{project_root_path} && ln -sf #{local_deploy_path}/#{env}/.env .env")
           execute("cd #{project_root_path} && ln -sf #{local_docker_path}/docker-compose.server.yml docker-compose.server.yml")
           execute("cd #{project_root_path} && docker-compose -f docker-compose.server.yml build")
-          execute("cd #{project_root_path} && docker login -u #{registry_login} -p #{registry_password} #{registry_server}")
+          execute("cd #{project_root_path} && docker login -u #{registry_login} -p '#{registry_password}' #{registry_server}")
           execute("cd #{project_root_path} && docker-compose -f docker-compose.server.yml push")
         end
         on config.env_host do
@@ -32,7 +32,7 @@ module DockerManager
             local_renew_cert_script = "docker/deploy/#{env}/renew_cert.sh"
             upload!(local_renew_cert_script, "#{env_remote_directory}/renew_cert.sh") if File.readable?(local_renew_cert_script)
           end
-          execute("docker login -u #{registry_login} -p #{registry_password} #{registry_server}")
+          execute("docker login -u #{registry_login} -p '#{registry_password}' #{registry_server}")
           execute("cd #{env_remote_directory} && docker-compose pull -q")
           execute("cd #{env_remote_directory} && docker-compose up -d #{containers_to_restart}")
           execute("docker system prune -f")
