@@ -2,13 +2,13 @@ module DockerManager
   class Config
     KEYS = {
       env: {
-        required: %i[host docker_user remote_directory remote_postgres_db_container local_postgres_db_container]
+        required: %i[host docker_user remote_directory remote_postgres_db_container local_postgres_db_container git_branch]
       },
       registry: {
         required: %i[login password],
         optional: %i[server]
       },
-      required: [],
+      required: %i[git_repository],
       optional: %i[containers_to_restart]
     }
 
@@ -50,6 +50,10 @@ module DockerManager
         exit 5
       end
       @local_deploy_path
+    end
+
+    def local_git_tmp_path
+      @local_git_tmp_path ||= "#{local_deploy_path}/tmp"
     end
 
     KEYS.keys.each do |parent_key|

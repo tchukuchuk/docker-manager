@@ -3,22 +3,27 @@ module DockerManager
     class Deploy < Base
       def run
         # to avoid scope issue
+        git_repository = config.git_repository
         env = config.env
+        local_git_tmp_path = config.local_git_tmp_path
         project_root_path = config.project_root_path
         local_docker_path = config.local_docker_path
         local_deploy_path = config.local_deploy_path
         registry_login = config.registry_login
         registry_password = config.registry_password
         registry_server = config.registry_server
+        env_git_branch = config.env_git_branch
         env_remote_directory = config.env_remote_directory
         containers_to_restart = (config.containers_to_restart || []).join(' ')
         run_locally do
+          execute("rm -fr #{local_git_tmp_path}")
+          execute("git clone -b #{env_git_branch} #{git_repository} #{local_git_tmp_path}")
+          execute("cp #{local_deploy_path}/#{env}/.env #{local_git_tmp_path}/.env")
+          execute("cp #{local_docker_path}/docker-compose.server.yml #{local_git_tmp_path}")
           # within doesn't work
-          execute("cd #{project_root_path} && ln -sf #{local_deploy_path}/#{env}/.env .env")
-          execute("cd #{project_root_path} && ln -sf #{local_docker_path}/docker-compose.server.yml docker-compose.server.yml")
-          execute("cd #{project_root_path} && docker-compose -f docker-compose.server.yml build")
-          execute("cd #{project_root_path} && docker login -u #{registry_login} -p '#{registry_password}' #{registry_server}")
-          execute("cd #{project_root_path} && docker-compose -f docker-compose.server.yml push")
+          execute("cd #{local_git_tmp_path} && TAG=#{env_git_branch} docker-compose -f docker-compose.server.yml build")
+          execute("cd #{local_git_tmp_path} && docker login -u #{registry_login} -p '#{registry_password}' #{registry_server}")
+          execute("cd #{local_git_tmp_path} && TAG=#{env_git_branch} docker-compose -f docker-compose.server.yml push")
         end
         on config.env_host do
           execute(:mkdir, "-p", "#{env_remote_directory}/data")
@@ -33,14 +38,9 @@ module DockerManager
             upload!(local_renew_cert_script, "#{env_remote_directory}/renew_cert.sh") if File.readable?(local_renew_cert_script)
           end
           execute("docker login -u #{registry_login} -p '#{registry_password}' #{registry_server}")
-          execute("cd #{env_remote_directory} && docker-compose pull -q")
-          execute("cd #{env_remote_directory} && docker-compose up -d #{containers_to_restart}")
+          execute("cd #{env_remote_directory} && TAG=#{env_git_branch} docker-compose pull -q")
+          execute("cd #{env_remote_directory} && TAG=#{env_git_branch} docker-compose up -d #{containers_to_restart}")
           execute("docker system prune -f")
-        end
-      ensure
-        run_locally do
-          execute("cd #{project_root_path} && ln -sf .env.development .env")
-          execute("cd #{project_root_path} && rm docker-compose.server.yml")
         end
       end
     end
