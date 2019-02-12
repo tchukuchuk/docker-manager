@@ -9,7 +9,7 @@ module DockerManager
           execute("rm -fr #{conf.local_git_tmp_path}")
           execute("git clone -b #{conf.env_git_branch} #{conf.git_repository} #{conf.local_git_tmp_path}")
           execute("touch #{conf.local_git_tmp_path}/.env")
-          execute("cp #{conf.local_docker_path}/docker-compose.server.yml #{conf.local_git_tmp_path}")
+          execute("cp #{conf.local_git_tmp_path}/docker/docker-compose.server.yml #{conf.local_git_tmp_path}")
           # within doesn't work
           change_dir = "cd #{conf.local_git_tmp_path}"
           compose_cmd = "#{change_dir} && TAG=#{conf.env_git_branch} docker-compose -f docker-compose.server.yml"
