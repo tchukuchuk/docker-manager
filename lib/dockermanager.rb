@@ -10,7 +10,7 @@ module DockerManager
 
   def run
     if ARGV.size < 2
-      puts "usage: dockermanager environment [deploy|db_pull] config_file"
+      puts "usage: dockermanager environment [deploy|db_pull|upload_config] config_file"
       exit 2
     end
     klass = "Commands::#{ARGV[1].split('_').collect(&:capitalize).join}"
